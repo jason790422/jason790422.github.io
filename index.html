@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jason Chien | Full Stack Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: #1e1e2e;
+      --accent: #7fdbca;
+      --accent2: #ff6b6b;
+      --accent3: #ffd93d;
+      --text: #e8e8f0;
+      --muted: #6b6b8a;
+      --card: #14141e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans TC', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.6;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(127,219,202,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(127,219,202,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── GLOW ORBS ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 { width: 500px; height: 500px; background: rgba(127,219,202,0.08); top: -150px; right: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(255,107,107,0.06); bottom: 20%; left: -100px; }
+    .orb-3 { width: 300px; height: 300px; background: rgba(255,217,61,0.05); top: 50%; right: 10%; }
+
+    /* ── LAYOUT ── */
+    main { position: relative; z-index: 1; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 40px;
+      gap: 60px;
+    }
+
+    .hero-left { position: relative; }
+
+    .tag-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      padding: 6px 14px;
+      border: 1px solid rgba(127,219,202,0.3);
+      border-radius: 100px;
+      background: rgba(127,219,202,0.05);
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .tag-line::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+
+    h1 .name-first { display: block; color: var(--text); }
+    h1 .name-last {
+      display: block;
+      -webkit-text-stroke: 1px var(--accent);
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .hero-subtitle span { color: var(--accent); font-weight: 500; }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      margin-top: 40px;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 500;
+      border: none;
+    }
+    .btn-primary:hover { background: #a0ede0; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(127,219,202,0.3); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* ── HERO RIGHT: Terminal ── */
+    .terminal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      animation: fadeUp 0.8s 0.4s ease both;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .terminal-header {
+      padding: 12px 16px;
+      background: #0d0d15;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #ff5f57; }
+    .dot-yellow { background: #febc2e; }
+    .dot-green { background: #28c840; }
+
+    .terminal-title {
+      margin-left: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .terminal-body {
+      padding: 24px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 2;
+    }
+
+    .t-comment { color: #4a4a6a; }
+    .t-key { color: var(--accent2); }
+    .t-val { color: var(--accent); }
+    .t-str { color: var(--accent3); }
+    .t-arr { color: #c792ea; }
+    .t-bracket { color: var(--muted); }
+    .t-cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent); animation: blink 1s step-end infinite; vertical-align: text-bottom; margin-left: 2px; }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* ── SECTION COMMON ── */
+    section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    .section-label .num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      opacity: 0.6;
+    }
+
+    .section-label h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
+    }
+
+    /* ── SKILLS ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .skill-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .skill-card:hover { border-color: rgba(127,219,202,0.3); transform: translateY(-4px); }
+    .skill-card:hover::before { transform: scaleX(1); }
+
+    .skill-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+    }
+
+    .skill-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: rgba(127,219,202,0.08);
+      color: var(--accent);
+      border: 1px solid rgba(127,219,202,0.15);
+    }
+
+    /* ── PROJECTS ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+    }
+
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .project-card:hover { border-color: rgba(127,219,202,0.3); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+
+    .project-header { display: flex; justify-content: space-between; align-items: flex-start; }
+
+    .project-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .project-arrow {
+      color: var(--muted);
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+
+    .project-card:hover .project-arrow { color: var(--accent); transform: translate(3px, -3px); }
+
+    .project-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .project-lang {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .lang-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+
+    /* ── REACT DEMO ── */
+    .demo-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .demo-header {
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .demo-header h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .demo-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      background: rgba(255,107,107,0.15);
+      color: var(--accent2);
+      border: 1px solid rgba(255,107,107,0.3);
+      border-radius: 100px;
+    }
+
+    .demo-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 0;
+    }
+
+    .demo-link {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px 28px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.3s ease;
+    }
+
+    .demo-link:last-child { border-right: none; }
+    .demo-link:hover { background: rgba(127,219,202,0.04); }
+    .demo-link:hover .demo-link-icon { color: var(--accent); }
+
+    .demo-link-icon { font-size: 1.8rem; transition: color 0.3s; }
+
+    .demo-link-info { flex: 1; }
+    .demo-link-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+    .demo-link-url { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); }
+
+    /* ── CONTACT ── */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .contact-text p {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    .contact-links { display: flex; flex-direction: column; gap: 12px; }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); transform: translateX(4px); }
+
+    .contact-link-icon { font-size: 1.2rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-left {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .footer-right {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .footer-right span { color: var(--accent); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10,10,15,0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(30,30,46,0.5);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 32px; }
+
+    .nav-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── DIVIDER ── */
+    .divider {
+      max-width: 1200px;
+      margin: 0 auto;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; padding: 120px 24px 60px; }
+      .terminal { display: none; }
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      section { padding: 60px 24px; }
+      .contact-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">jason<span>.</span>dev</div>
+  <div class="nav-links">
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#demo">Demo</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-left">
+      <div class="tag-line">Available for work · Taiwan</div>
+      <h1>
+        <span class="name-first">Jason</span>
+        <span class="name-last">Chien</span>
+      </h1>
+      <p class="hero-subtitle">
+        Full Stack Developer 專注於 <span>Web Application</span> 開發，
+        熟悉 <span>Node.js</span>、<span>PHP</span>、<span>Docker</span> 容器化部署，
+        打造穩定且高效的後端系統。
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">→ 查看專案</a>
+        <a href="https://github.com/jason790422" target="_blank" class="btn btn-secondary">⟨/⟩ GitHub</a>
+      </div>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+        <div class="terminal-title">jason@portfolio ~ profile.json</div>
+      </div>
+      <div class="terminal-body">
+        <div class="t-comment">// Developer Profile</div>
+        <div><span class="t-bracket">{</span></div>
+        <div>&nbsp;&nbsp;<span class="t-key">"name"</span>: <span class="t-str">"Jason Chien"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="t-key">"location"</span>: <span class="t-str">"Taiwan 🇹🇼"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="t-key">"role"</span>: <span class="t-str">"Full Stack Developer"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="t-key">"stack"</span>: <span class="t-bracket">[</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-str">"Node.js"</span>, <span class="t-str">"React"</span>,</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-str">"PHP"</span>, <span class="t-str">"Docker"</span>,</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-str">"Nginx"</span>, <span class="t-str">"MySQL"</span></div>
+        <div>&nbsp;&nbsp;<span class="t-bracket">]</span>,</div>
+        <div>&nbsp;&nbsp;<span class="t-key">"github"</span>: <span class="t-arr">"jason790422"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="t-key">"openToWork"</span>: <span class="t-val">true</span></div>
+        <div><span class="t-bracket">}</span><span class="t-cursor"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-label fade-in">
+      <span class="num">01</span>
+      <h2>技術棧</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card fade-in">
+        <div class="skill-icon">⚙️</div>
+        <div class="skill-title">Backend Development</div>
+        <div class="skill-tags">
+          <span class="tag">Node.js</span>
+          <span class="tag">PHP 8.2</span>
+          <span class="tag">Express</span>
+          <span class="tag">REST API</span>
+        </div>
+      </div>
+      <div class="skill-card fade-in">
+        <div class="skill-icon">🎨</div>
+        <div class="skill-title">Frontend Development</div>
+        <div class="skill-tags">
+          <span class="tag">React</span>
+          <span class="tag">HTML5</span>
+          <span class="tag">CSS3</span>
+          <span class="tag">JavaScript</span>
+        </div>
+      </div>
+      <div class="skill-card fade-in">
+        <div class="skill-icon">🐳</div>
+        <div class="skill-title">DevOps & Infrastructure</div>
+        <div class="skill-tags">
+          <span class="tag">Docker</span>
+          <span class="tag">Nginx</span>
+          <span class="tag">Debian</span>
+          <span class="tag">Dockerfile</span>
+        </div>
+      </div>
+      <div class="skill-card fade-in">
+        <div class="skill-icon">🗄️</div>
+        <div class="skill-title">Database</div>
+        <div class="skill-tags">
+          <span class="tag">MySQL</span>
+          <span class="tag">MSSQL 2017</span>
+          <span class="tag">SQL</span>
+        </div>
+      </div>
+      <div class="skill-card fade-in">
+        <div class="skill-icon">🔌</div>
+        <div class="skill-title">Third-party Integration</div>
+        <div class="skill-tags">
+          <span class="tag">LINE Login</span>
+          <span class="tag">OAuth 2.0</span>
+          <span class="tag">WebSocket</span>
+        </div>
+      </div>
+      <div class="skill-card fade-in">
+        <div class="skill-icon">🔒</div>
+        <div class="skill-title">Security & Tools</div>
+        <div class="skill-tags">
+          <span class="tag">PHP Obfuscator</span>
+          <span class="tag">Cron Jobs</span>
+          <span class="tag">Git</span>
+          <span class="tag">GitHub</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-label fade-in">
+      <span class="num">02</span>
+      <h2>GitHub 專案</h2>
+    </div>
+    <div class="projects-grid">
+      <a href="https://github.com/jason790422/nodejschatroom" target="_blank" class="project-card fade-in">
+        <div class="project-header">
+          <div class="project-name">nodejschatroom</div>
+          <div class="project-arrow">↗</div>
+        </div>
+        <div class="project-desc">運用 Node.js 製作簡易的聊天室，整合多種套件實現即時通訊功能，使用 WebSocket 技術達成雙向即時傳輸。</div>
+        <div class="project-lang">
+          <div class="lang-dot" style="background: #f1e05a;"></div>
+          JavaScript
+        </div>
+      </a>
+
+      <a href="https://github.com/jason790422/line-login-demo" target="_blank" class="project-card fade-in">
+        <div class="project-header">
+          <div class="project-name">line-login-demo</div>
+          <div class="project-arrow">↗</div>
+        </div>
+        <div class="project-desc">LINE Login OAuth 2.0 串接示範，使用 PHP 實作第三方登入流程，提供完整的使用者驗證整合方案。</div>
+        <div class="project-lang">
+          <div class="lang-dot" style="background: #4F5D95;"></div>
+          PHP
+        </div>
+      </a>
+
+      <a href="https://github.com/jason790422/docker-nginx-php-sql" target="_blank" class="project-card fade-in">
+        <div class="project-header">
+          <div class="project-name">docker-nginx-php-sql</div>
+          <div class="project-arrow">↗</div>
+        </div>
+        <div class="project-desc">Docker 容器化 LEMP 架構，整合 Nginx、PHP、MySQL，一鍵部署完整後端環境，提高開發效率。</div>
+        <div class="project-lang">
+          <div class="lang-dot" style="background: #384d54;"></div>
+          Dockerfile
+        </div>
+      </a>
+
+      <a href="https://github.com/jason790422/docker-debian-server" target="_blank" class="project-card fade-in">
+        <div class="project-header">
+          <div class="project-name">docker-debian-server</div>
+          <div class="project-arrow">↗</div>
+        </div>
+        <div class="project-desc">基於 Debian 12 的 Docker 伺服器環境，配置 Nginx、PHP 8.2、cron jobs 和 at 命令，適合生產環境部署。</div>
+        <div class="project-lang">
+          <div class="lang-dot" style="background: #384d54;"></div>
+          Dockerfile
+        </div>
+      </a>
+
+      <a href="https://github.com/jason790422/docker-mssql2017" target="_blank" class="project-card fade-in">
+        <div class="project-header">
+          <div class="project-name">docker-mssql2017</div>
+          <div class="project-arrow">↗</div>
+        </div>
+        <div class="project-desc">Microsoft SQL Server 2017 Docker 容器化配置，讓 MSSQL 在任何環境快速啟動，方便企業級資料庫開發測試。</div>
+        <div class="project-lang">
+          <div class="lang-dot" style="background: #384d54;"></div>
+          Dockerfile
+        </div>
+      </a>
+
+      <a href="https://github.com/jason790422/php-obfuscator" target="_blank" class="project-card fade-in">
+        <div class="project-header">
+          <div class="project-name">php-obfuscator</div>
+          <div class="project-arrow">↗</div>
+        </div>
+        <div class="project-desc">PHP 代碼混淆工具 (fork from yakpro-po)，保護 PHP 原始碼安全性，適用於商業軟體發行前的程式碼保護。</div>
+        <div class="project-lang">
+          <div class="lang-dot" style="background: #4F5D95;"></div>
+          PHP
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- REACT DEMO -->
+  <section id="demo">
+    <div class="section-label fade-in">
+      <span class="num">03</span>
+      <h2>React Demo</h2>
+    </div>
+    <div class="demo-section fade-in">
+      <div class="demo-header">
+        <h3>⚛️ Live Demos — GitHub Pages</h3>
+        <span class="demo-badge">React + Vite Build</span>
+      </div>
+      <div class="demo-links">
+        <!-- 請在這裡填入你的 React Demo 連結 -->
+        <a href="https://jason790422.github.io/" target="_blank" class="demo-link">
+          <div class="demo-link-icon">🚀</div>
+          <div class="demo-link-info">
+            <div class="demo-link-title">Portfolio Homepage</div>
+            <div class="demo-link-url">jason790422.github.io</div>
+          </div>
+          <span style="color:var(--muted)">↗</span>
+        </a>
+        <!--
+          複製以下區塊，新增更多 Demo：
+          <a href="YOUR_DEMO_URL" target="_blank" class="demo-link">
+            <div class="demo-link-icon">⚛️</div>
+            <div class="demo-link-info">
+              <div class="demo-link-title">Demo 名稱</div>
+              <div class="demo-link-url">demo-url</div>
+            </div>
+            <span style="color:var(--muted)">↗</span>
+          </a>
+        -->
+        <a href="https://github.com/jason790422" target="_blank" class="demo-link">
+          <div class="demo-link-icon">📦</div>
+          <div class="demo-link-info">
+            <div class="demo-link-title">Source Code on GitHub</div>
+            <div class="demo-link-url">github.com/jason790422</div>
+          </div>
+          <span style="color:var(--muted)">↗</span>
+        </a>
+      </div>
+    </div>
+    <p style="margin-top:20px; font-family:'DM Mono',monospace; font-size:0.78rem; color:var(--muted);">
+      💡 將你的 React 專案 build 後，放到對應的 GitHub repo 啟用 Pages 即可在上方新增 Demo 連結。
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-label fade-in">
+      <span class="num">04</span>
+      <h2>聯絡我</h2>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-text fade-in">
+        <p>歡迎各種合作機會、技術交流或工作邀請。</p>
+        <p>我對全端開發、容器化部署及現代 Web 技術充滿熱情，期待與您共同創造優秀的產品。</p>
+      </div>
+      <div class="contact-links fade-in">
+        <a href="https://github.com/jason790422" target="_blank" class="contact-link">
+          <span class="contact-link-icon">⟨/⟩</span>
+          github.com/jason790422
+        </a>
+        <!-- 可新增 Email、LinkedIn 等 -->
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="divider"></div>
+  <footer>
+    <div class="footer-left">© 2026 Jason Chien. Built with ♥</div>
+    <div class="footer-right">Hosted on <span>GitHub Pages</span></div>
+  </footer>
+</main>
+
+<script>
+  // Scroll-triggered fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Smooth nav highlight
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 200) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
+    });
+  });
+</script>
+</body>
+</html>
